@@ -4,16 +4,16 @@ import { itemsActions } from "../store/itemsSlice";
 import { fetchStatusActions } from "../store/fetchStatusSlice";
 
 const FetchItems = () => {
-  const fetchStatus = useSelector((store => store.fetchStatus));
+  const fetchStatus = useSelector((store) => store.fetchStatus);
   const dispatch = useDispatch();
 
-   useEffect(() => {
-    if(fetchStatus.fetchDone) return;
+  useEffect(() => {
+    if (fetchStatus.fetchDone) return;
 
     const controller = new AbortController();
     const signal = controller.signal;
     dispatch(fetchStatusActions.markFetchingStarted());
-    fetch("http://localhost:8080/items", { signal })
+    fetch("https://myntra-backend-dataprovider.onrender.com/items", { signal })
       .then((res) => res.json())
       .then(({ items }) => {
         dispatch(fetchStatusActions.markFetchDone());
@@ -26,9 +26,7 @@ const FetchItems = () => {
     };
   }, [fetchStatus]);
 
-
-  return <></>
-
+  return <></>;
 };
 
-export default FetchItems; 
+export default FetchItems;
