@@ -13,13 +13,12 @@ const FetchItems = () => {
     const controller = new AbortController();
     const signal = controller.signal;
     dispatch(fetchStatusActions.markFetchingStarted());
-    fetch("https://myntra-backend-dataprovider.onrender.com/items", { signal })
+    fetch("https://myntra-backend-dataprovider.onrender.com/items")
       .then((res) => res.json())
-      .then(({ items }) => {
-        dispatch(fetchStatusActions.markFetchDone());
-        dispatch(fetchStatusActions.markFetchingFinished());
-        dispatch(itemsActions.addInitialItems(items));
-      });
+      .then((data) => {
+        console.log("API DATA:", data);
+      })
+      .catch((err) => console.error("FETCH ERROR:", err));
 
     return () => {
       controller.abort();
