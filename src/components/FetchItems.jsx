@@ -1,31 +1,36 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { itemsActions } from "../store/itemsSlice";
 import { fetchStatusActions } from "../store/fetchStatusSlice";
 
 const FetchItems = () => {
-  const fetchStatus = useSelector((store) => store.fetchStatus);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (fetchStatus.fetchDone) return;
-
     const controller = new AbortController();
-    const signal = controller.signal;
-    dispatch(fetchStatusActions.markFetchingStarted());
+
     fetch("https://myntra-backend-dataprovider.onrender.com/items")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("API DATA:", data);
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch items");
+        }
+        return res.json();
       })
-      .catch((err) => console.error("FETCH ERROR:", err));
+      .then(({ items }) => {
+        dispatch(fetchStatusActions.markFetchDone());
+        dispatch(fetchStatusActions.markFetchingFinished());
+        dispatch(itemsActions.addInitialItems(items));
+      })
+      .catch((err) => {
+        if (err.name !== "AbortError") {
+          console.error("Fetch error:", err);
+        }
+      });
 
-    return () => {
-      controller.abort();
-    };
-  }, [fetchStatus]);
+    return () => controller.abort();
+  }, [dispatch]);
 
-  return <></>;
+  return null;
 };
 
 export default FetchItems;
